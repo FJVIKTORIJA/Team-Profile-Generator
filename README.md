@@ -7,6 +7,8 @@ This projects creates an HTML file based on the user input.
 ## Usage
 
 To use this application clone the repository and run the command npm i. Then run the command node index.js and you will be asked several questions. At least one of the roles questions has to be answered to generate HTML file.
+<img width="1381" alt="Screenshot 2021-09-29 at 22 31 15" src="https://user-images.githubusercontent.com/83015268/135351698-28c01b48-f6e6-4e86-8fed-8a38cb6b46db.png">
+
 Link to Walkthrough [Link](https://youtu.be/9rdwqNurrR4)
 
 ## Acceptance Criteria
