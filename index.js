@@ -8,12 +8,6 @@ const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
 const template = require("./src/template");
 
-const writeFileSync = util.promisify(fs.writeFile);
-const mkdirAsync = util.promisify(fs.mkdir);
-var employeeObjects = [];
-var employeeData = [];
-var employeeCards = [];
-
 const questions = [
   { name: "name", message: "Name of the employee?" },
   { name: "id", message: "ID of the employee ?" },
@@ -45,80 +39,75 @@ const confirm = [
   },
 ];
 
+const generateEmployees = (employees) => {
+  const employeesArrHtml = employees.map((employee) => {
+    return `
+    <div class="card" style="width: 18rem;">
+    <div class="card-body">
+      <h5 class="card-title">Name: ${employee.getName()}</h5>
+      <h6 class="card-title">Role: ${employee.getRole()}</h6>
+    </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">ID: ${employee.getId()}</li>
+      <li class="list-group-item"> Email: <a href="mailto:">${employee.getEmail()}</a></li>
+      <li class="list-group-item">Github: <a href="mailto:">${employee.getGIthub()}</li>
+      <li class="list-group-item">School: ${employee.getSchool()}</li>
+    </ul>
+  </div>
+    `;
+  });
+  const employeesHtml = employeesArrHtml.join("");
+  const html = `
+  <!DOCTYPE html>
+  <html lang="en-us">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+      <link href="./style.css" rel="stylesheet" type="text/css">
+      <title>Company Team</title>
+  </head>
+  <body>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <h1>Company Team</h1>
+      </nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <main>
+          <div class="main-container">
+            ${employeesHtml}
+          </div>
+      </main>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+  </body>
+  </html>
+  `;
+
+  fs.writeFileSync("./dist/index.html", html);
+};
+
 const init = async () => {
-  const employee = [];
+  const employees = [];
   let addMore = true;
 
   while (addMore) {
     const { name, id, email, role } = await inquirer.prompt(questions);
     if (role === "Manager") {
       const { officeNumber } = await inquirer.prompt(questionsManager);
-      employee.push(new Manager(name, id, email, officeNumber));
+      employees.push(new Manager(name, id, email, officeNumber));
     } else if (role === "Engineer") {
       const { github } = await inquirer.prompt(questionsEngineer);
-      employee.push(new Engineer(name, id, email, github));
+      employees.push(new Engineer(name, id, email, github));
     } else {
       const { school } = await inquirer.prompt(questionsIntern);
-      employee.push(new Intern(name, id, email, school));
+      employees.push(new Intern(name, id, email, school));
     }
     const { adding } = await inquirer.prompt(confirm);
 
     addMore = adding;
+    if (!adding) {
+      generateEmployees(employees);
+    }
   }
 };
-
-for (const employee of employeeData) {
-  const newProfile = createProfile(
-    employee.employee_role,
-    employee.employee_name,
-    employee.employee_id,
-    employee.employee_email
-  );
-  employeeObjects.push(newProfile);
-}
-
-for (const employee of employeeObjects) {
-  switch (employee.role) {
-    case "Manager":
-      employeeCards.push(
-        template.employeeCard(
-          employee.name,
-          employee.role,
-          `ID: ${employee.id}`,
-          `${employee.email}`,
-          `Office: ${employee.officeNumber}`
-        )
-      );
-      break;
-    case "Engineer":
-      employeeCards.push(
-        template.employeeCard(
-          employee.name,
-          employee.role,
-          `ID: ${employee.id}`,
-          `${employee.email}`,
-          `GitHub: <a href="https://github.com/${employee.github}" target="_blank">${employee.github}</a>`
-        )
-      );
-      break;
-    case "Intern":
-      employeeCards.push(
-        template.employeeCard(
-          employee.name,
-          employee.role,
-          `ID: ${employee.id}`,
-          `${employee.email}`,
-          `School: ${employee.school}`
-        )
-      );
-      break;
-  }
-}
-console.log("The HTML document is being rendered...");
-
-const employeeCardsHTML = employeeCards.join("");
-const HTMLData = template.createHTML(employeeCardsHTML);
-fs.writeFileSync("./dist/index.html", HTMLData);
-console.log("File was written to your 'dist' folder and named 'index.html'!");
 
 init();

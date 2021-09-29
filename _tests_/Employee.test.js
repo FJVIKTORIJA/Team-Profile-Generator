@@ -22,4 +22,10 @@ describe("Employee", () => {
   it("should getRole from employee", () => {
     expect(john.getRole()).toBe("role");
   });
+  it("should getschool from employee", () => {
+    expect(john.getSchool()).toBe("School");
+  });
+  it("should getGIthub from employee", () => {
+    expect(john.getGIthub()).toBe("Github");
+  });
 });
